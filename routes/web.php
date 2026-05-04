@@ -1,19 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ArticleController;
+use App\Models\Article;
 
 Route::get('/', function () {
-    return view('home');
+    $articles = Article::latest()->take(3)->get();
+    return view('home', compact('articles'));
 });
 
 Route::get('/profile', function () {
     return view('profile');
 });
 
-Route::get('/articles', function () {
-    return view('articles');
-});
-
 Route::get('/contact', function () {
     return view('contact');
 });
+
+Route::resource('articles', ArticleController::class);

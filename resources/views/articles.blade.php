@@ -47,7 +47,6 @@
             object-fit: cover;
         }
 
-        /* Membuat body kartu fleksibel agar tombol sejajar di bawah */
         .card-body {
             display: flex;
             flex-direction: column;
@@ -73,7 +72,7 @@
             transition: 0.3s;
             color: white;
             padding: 10px 20px;
-            margin-top: auto; /* Memaksa tombol ke dasar kartu */
+            margin-top: auto; 
         }
 
         .btn-navy:hover {
@@ -111,8 +110,9 @@
 <div class="container mt-5">
     <h2 class="text-center mb-5 fw-bold" style="color: #0a1f44;">Articles</h2>
 
+    {{-- Definisi Data Cukup Sekali Saja --}}
     @php
-    $titles = [
+    $defaultTitles = [
         "Belajar HTML & CSS Dasar",
         "Mengenal Laravel untuk Pemula",
         "Tips Membuat Website Responsif",
@@ -121,7 +121,7 @@
         "Cara Membuat Blog Sederhana"
     ];
 
-    $descs = [
+    $defaultDescs = [
         "Pelajari dasar HTML dan CSS untuk membuat tampilan website yang rapi dan terstruktur.",
         "Panduan lengkap Laravel untuk pemula agar bisa membuat web lebih cepat dan efisien.",
         "Tips membuat website yang tampilannya fleksibel di semua ukuran layar.",
@@ -141,32 +141,80 @@
     @endphp
 
     <div class="row g-4">
-        @for ($i = 0; $i < 6; $i++)
-        <div class="col-lg-4 col-md-6">
-            <div class="card h-100">
-                <img src="{{ $images[$i] }}" alt="{{ $titles[$i] }}">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">
-                        {{ $titles[$i] }}
-                    </h5>
-                    <p class="card-text text-muted small">
-                        {{ $descs[$i] }}
-                    </p>
-                    <a href="#" class="btn btn-navy w-100">
-                        Read More
-                    </a>
-                </div>
+
+    {{-- 1. TAMPILKAN 6 ARTIKEL DEFAULT --}}
+    @for ($i = 0; $i < 6; $i++)
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100">
+            <img src="{{ $images[$i] }}" alt="article">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ $defaultTitles[$i] }}</h5>
+                <p class="card-text text-muted small">{{ $defaultDescs[$i] }}</p>
+                
+                <a href="#" class="btn btn-navy w-100 mb-2">Read More</a>
+                
+                {{-- Tombol Hapus Statik agar tampilan sama --}}
+                <button class="btn btn-danger w-100" onclick="return confirm('Artikel bawaan tidak bisa dihapus.')">
+                    Hapus
+                </button>
             </div>
         </div>
-        @endfor
     </div>
-</div>
+    @endfor
 
-<footer class="text-center mt-5 p-4">
-    <div class="container">
-        <small>© 2026 Khurin Nafiah • Built with Laravel & Bootstrap</small>
+    {{-- 2. TAMPILKAN ARTIKEL DARI DATABASE --}}
+    @foreach ($articles as $a)
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100">
+            <img src="{{ $a->image ?? $images[0] }}" alt="{{ $a->title }}">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ $a->title }}</h5>
+                <p class="card-text text-muted small">{{ $a->description }}</p>
+
+                <a href="#" class="btn btn-navy w-100 mb-2">Read More</a>
+
+                <form action="/articles/{{ $a->id }}" method="POST" onsubmit="return confirm('Yakin mau hapus artikel ini?')">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-danger w-100">Hapus</button>
+                </form>
+            </div>
+        </div>
     </div>
-</footer>
+    @endforeach
+
+    </div> {{-- End Row --}}
+
+    <hr class="my-5">
+
+    {{-- FORM TAMBAH ARTIKEL --}}
+    <div class="p-4 bg-white rounded-4 shadow-sm mb-5">
+        <div class="p-3 rounded-3 text-white mb-4" style="background: linear-gradient(135deg, #0a1f44, #162d55);">
+            <h4 class="mb-0 fw-bold">Tambah Artikel</h4>
+            <small style="opacity:0.8;">Buat artikel baru di blog kamu</small>
+        </div>
+
+        <form action="/articles" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Judul</label>
+                <input type="text" name="title" class="form-control rounded-3 border-0 shadow-sm" placeholder="Masukkan judul artikel" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Deskripsi</label>
+                <textarea name="description" class="form-control rounded-3 border-0 shadow-sm" rows="3" placeholder="Tulis isi artikel..." required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Image URL (opsional)</label>
+                <input type="text" name="image" class="form-control rounded-3 border-0 shadow-sm" placeholder="https://...">
+            </div>
+            <button class="btn w-100 text-white fw-semibold rounded-3 shadow-sm" style="background: linear-gradient(135deg, #0a1f44, #1b3a6b); padding:12px;">
+                + Tambah Artikel
+            </button>
+        </form>
+    </div>
+
+</div> {{-- End Container --}}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
