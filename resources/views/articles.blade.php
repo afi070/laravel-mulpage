@@ -118,7 +118,14 @@
     @foreach ($articles as $a)
     <div class="col-lg-4 col-md-6">
         <div class="card h-100">
-            <img src="{{ $a->image ?? $images[0] }}" alt="{{ $a->title }}">
+            {{-- TAMPILAN GAMBAR - Support image_path (upload) dan image_url (link) --}}
+            @if($a->image_path)
+                <img src="{{ asset('storage/' . $a->image_path) }}" alt="{{ $a->title }}">
+            @elseif($a->image_url)
+                <img src="{{ $a->image_url }}" alt="{{ $a->title }}">
+            @else
+                <img src="{{ $images[0] }}" alt="{{ $a->title }}">
+            @endif
             <div class="card-body">
                 <h5 class="card-title fw-bold" style="color: #0a1f44;">{{ $a->title }}</h5>
                 <p class="card-text text-muted small">{{ $a->description }}</p>
@@ -143,7 +150,7 @@
         </div>
     </div>
 
-    <!-- MODAL EDIT ASLI -->
+    <!-- MODAL EDIT ASLI (DENGAN UPLOAD FILE) -->
     <div class="modal fade" id="editModal{{ $a->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
@@ -151,7 +158,7 @@
                     <h5 class="modal-title fw-bold">Edit Artikel</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="/articles/{{ $a->id }}" method="POST">
+                <form action="/articles/{{ $a->id }}" method="POST" enctype="multipart/form-data">
                     @csrf @method('PUT')
                     <div class="modal-body p-4">
                         <div class="mb-3">
@@ -162,9 +169,31 @@
                             <label class="form-label fw-bold">Deskripsi</label>
                             <textarea name="description" class="form-control" rows="4" required>{{ $a->description }}</textarea>
                         </div>
+                        
+                        {{-- Gambar Saat Ini --}}
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Image URL</label>
-                            <input type="text" name="image" class="form-control" value="{{ $a->image }}">
+                            <label class="form-label fw-bold">Gambar Saat Ini</label>
+                            @if($a->image_path)
+                                <div>
+                                    <img src="{{ asset('storage/' . $a->image_path) }}" style="max-width: 150px; border-radius: 5px;">
+                                    <p class="text-success mt-1"><small>✓ File upload</small></p>
+                                </div>
+                            @elseif($a->image_url)
+                                <div>
+                                    <img src="{{ $a->image_url }}" style="max-width: 150px; border-radius: 5px;">
+                                    <p class="text-info mt-1"><small>✓ Link URL</small></p>
+                                </div>
+                            @else
+                                <p class="text-muted">Tidak ada gambar</p>
+                            @endif
+                        </div>
+                        
+                        {{-- Ganti Gambar --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ganti Gambar (Opsional)</label>
+                            <input type="file" name="image" class="form-control" accept="image/jpeg,image/png,image/gif">
+                            <small class="text-muted">Upload file baru untuk mengganti gambar (Max 2MB)</small>
+                            <div id="preview_edit_{{ $a->id }}" class="mt-2"></div>
                         </div>
                     </div>
                     <div class="modal-footer border-0">
@@ -181,25 +210,62 @@
 
     <hr class="my-5">
 
-    {{-- FORM TAMBAH ARTIKEL --}}
+    {{-- FORM TAMBAH ARTIKEL DENGAN UPLOAD FILE --}}
     <div class="p-4 bg-white rounded-4 shadow-sm mb-5">
         <div class="p-3 rounded-3 text-white mb-4" style="background: linear-gradient(135deg, #0a1f44, #162d55);">
             <h4 class="mb-0 fw-bold">Tambah Artikel</h4>
         </div>
-        <form action="/articles" method="POST">
+        
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="/articles" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
-                <label class="form-label fw-semibold">Judul</label>
+                <label class="form-label fw-semibold">Judul <span class="text-danger">*</span></label>
                 <input type="text" name="title" class="form-control border-0 shadow-sm" placeholder="Masukkan judul" required>
             </div>
             <div class="mb-3">
-                <label class="form-label fw-semibold">Deskripsi</label>
+                <label class="form-label fw-semibold">Deskripsi <span class="text-danger">*</span></label>
                 <textarea name="description" class="form-control border-0 shadow-sm" rows="3" placeholder="Tulis isi..." required></textarea>
             </div>
+            
+            {{-- Pilihan Gambar --}}
             <div class="mb-3">
-                <label class="form-label fw-semibold">Image URL</label>
-                <input type="text" name="image" class="form-control border-0 shadow-sm" placeholder="https://...">
+                <label class="form-label fw-semibold">Gambar Artikel</label>
+                
+                <div class="d-flex gap-3 mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="image_type" id="type_upload" value="upload" checked>
+                        <label class="form-check-label" for="type_upload">📁 Upload File</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="image_type" id="type_url" value="url">
+                        <label class="form-check-label" for="type_url">🔗 Link URL</label>
+                    </div>
+                </div>
+                
+                {{-- Upload file --}}
+                <div id="upload_section">
+                    <input type="file" name="image" class="form-control border-0 shadow-sm" accept="image/*">
+                    <small class="text-muted">Format JPG, PNG (Max 2MB)</small>
+                    <div id="preview_tambah" class="mt-2"></div>
+                </div>
+                
+                {{-- Link URL (tetap dipertahankan) --}}
+                <div id="url_section" style="display: none;">
+                    <input type="text" name="image_url" class="form-control border-0 shadow-sm" placeholder="https://...">
+                    <small class="text-muted">Masukkan URL gambar</small>
+                </div>
             </div>
+            
             <button type="submit" class="btn w-100 text-white fw-semibold rounded-3 shadow-sm" style="background: linear-gradient(135deg, #0a1f44, #1b3a6b); padding:12px;">
                 + Tambah Artikel
             </button>
@@ -208,5 +274,63 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Toggle upload vs URL untuk form tambah
+const uploadSection = document.getElementById('upload_section');
+const urlSection = document.getElementById('url_section');
+const radioUpload = document.getElementById('type_upload');
+const radioUrl = document.getElementById('type_url');
+
+if (radioUpload && radioUrl) {
+    radioUpload.addEventListener('change', function() {
+        uploadSection.style.display = 'block';
+        urlSection.style.display = 'none';
+    });
+    
+    radioUrl.addEventListener('change', function() {
+        uploadSection.style.display = 'none';
+        urlSection.style.display = 'block';
+    });
+}
+
+const imageInput = document.querySelector('input[name="image"]');
+const previewTambah = document.getElementById('preview_tambah');
+
+if (imageInput) {
+    imageInput.addEventListener('change', function() {
+        previewTambah.innerHTML = '';
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            if (file.type.startsWith('image/') && file.size <= 2 * 1024 * 1024) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewTambah.innerHTML = `<img src="${e.target.result}" style="max-width: 150px; border-radius: 5px; margin-top: 10px;">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewTambah.innerHTML = '<div class="alert alert-danger mt-2">File harus gambar dan maksimal 2MB</div>';
+                this.value = '';
+            }
+        }
+    });
+}
+
+
+@foreach ($articles as $a)
+document.querySelector('#editModal{{ $a->id }} input[name="image"]')?.addEventListener('change', function(e) {
+    const previewDiv = document.getElementById('preview_edit_{{ $a->id }}');
+    previewDiv.innerHTML = '';
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewDiv.innerHTML = `<img src="${e.target.result}" style="max-width: 150px; border-radius: 5px; margin-top: 10px;">`;
+        };
+        reader.readAsDataURL(this.files[0]);
+    }
+});
+@endforeach
+</script>
+
 </body>
 </html>
