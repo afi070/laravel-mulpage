@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Article;
 use Illuminate\Support\Facades\Storage;
 
-class ArticleController extends Controller  // ← extends Controller.php
+class ArticleController extends Controller
 {
     public function index()
     {
@@ -24,11 +24,12 @@ class ArticleController extends Controller  // ← extends Controller.php
         $request->validate([
             'title' => 'required',
             'description' => 'required',
+            'full_content' => 'required', // ← TAMBAHKAN VALIDASI
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'image_url' => 'nullable|url'
         ]);
 
-        $data = $request->only(['title', 'description']);
+        $data = $request->only(['title', 'description', 'full_content']); // ← TAMBAHKAN 'full_content'
         
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('articles', 'public');
@@ -57,10 +58,11 @@ class ArticleController extends Controller  // ← extends Controller.php
         $request->validate([
             'title' => 'required',
             'description' => 'required',
+            'full_content' => 'required', // ← TAMBAHKAN VALIDASI
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $data = $request->only(['title', 'description']);
+        $data = $request->only(['title', 'description', 'full_content']); // ← TAMBAHKAN 'full_content'
         
         if ($request->hasFile('image')) {
             if ($article->image_path) {

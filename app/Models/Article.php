@@ -12,6 +12,7 @@ class Article extends Model
     protected $fillable = [
         'title', 
         'description', 
+        'full_content',     // ← TAMBAHKAN INI
         'image_url',
         'image_path'
     ];

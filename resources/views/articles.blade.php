@@ -1,3 +1,4 @@
+{{-- FILE: resources/views/articles.blade.php --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -57,6 +58,16 @@
         .color-delete { color: #dc3545; } /* Merah */
         
         .icon-btn:hover { transform: scale(1.2); filter: brightness(1.1); }
+
+        /* Modal detail artikel */
+        .modal-detail .modal-content {
+            border-radius: 15px;
+        }
+        .modal-detail .modal-body img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
@@ -82,6 +93,14 @@
     @php
     $defaultTitles = ["Belajar HTML & CSS Dasar", "Mengenal Laravel untuk Pemula", "Tips Membuat Website Responsif", "Panduan Bootstrap Modern", "Trend Teknologi Web 2026", "Cara Membuat Blog Sederhana"];
     $defaultDescs = ["Pelajari dasar HTML dan CSS untuk membuat tampilan website yang rapi dan terstruktur.", "Panduan lengkap Laravel untuk pemula agar bisa membuat web lebih cepat dan efisien.", "Tips membuat website yang tampilannya fleksibel di semua ukuran layar.", "Belajar Bootstrap untuk mempercepat pembuatan UI modern dan responsif.", "Update perkembangan teknologi web terbaru yang wajib kamu ketahui.", "Langkah mudah membuat blog sederhana menggunakan HTML, CSS, dan Laravel dasar."];
+    $fullContents = [
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        "Laravel adalah framework PHP yang powerful dan elegan. Dalam artikel ini kita akan membahas dasar-dasar Laravel termasuk routing, controller, blade template, dan Eloquent ORM. Dengan memahami Laravel, Anda bisa membangun website modern dengan cepat dan efisien. Framework ini juga menyediakan berbagai fitur keamanan dan kemudahan dalam pengelolaan database.",
+        "Website responsif adalah keharusan di era mobile saat ini. Pelajari teknik-teknik menggunakan CSS Grid, Flexbox, dan media queries untuk membuat tampilan yang adaptif di berbagai perangkat. Kami juga akan membahas tips praktis untuk menguji responsivitas website Anda.",
+        "Bootstrap 5 hadir dengan berbagai komponen modern yang memudahkan pengembangan website. Dalam panduan ini, Anda akan belajar menggunakan grid system, komponen navbar, card, modal, dan utility classes yang membuat styling menjadi lebih cepat.",
+        "Tahun 2026 membawa berbagai tren baru dalam pengembangan web termasuk penguasaan AI, WebAssembly, dan framework modern. Simak update lengkapnya di sini untuk tetap up-to-date dengan teknologi terkini.",
+        "Membuat blog sendiri tidak pernah semudah ini. Ikuti langkah-langkah praktis mulai dari setup environment Laravel, membuat database, CRUD artikel, hingga deployment ke hosting. Cocok untuk pemula yang ingin memiliki blog pribadi."
+    ];
     $images = ["https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1526378722484-bd91ca387e72?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop"];
     @endphp
 
@@ -97,7 +116,9 @@
                 <p class="card-text text-muted small">{{ $defaultDescs[$i] }}</p>
                 
                 <div class="d-flex justify-content-between align-items-center mt-auto">
-                    <a href="#" class="btn btn-navy px-4">Read More</a>
+                    <button type="button" class="btn btn-navy px-4" data-bs-toggle="modal" data-bs-target="#detailModalDefault{{ $i }}">
+                        Read More
+                    </button>
                     <div style="opacity: 0.8;" class="d-flex align-items-center">
                         {{-- Tombol Edit Dummy --}}
                         <button class="icon-btn color-edit" onclick="alert('Data default tidak bisa diubah')">
@@ -108,6 +129,28 @@
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL UNTUK ARTIKEL DEFAULT -->
+    <div class="modal fade modal-detail" id="detailModalDefault{{ $i }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white" style="background: #0a1f44;">
+                    <h5 class="modal-title fw-bold">{{ $defaultTitles[$i] }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <img src="{{ $images[$i] }}" alt="{{ $defaultTitles[$i] }}" style="width: 100%; border-radius: 10px; margin-bottom: 20px;">
+                    <h6 class="fw-bold mb-3">Deskripsi</h6>
+                    <p>{{ $defaultDescs[$i] }}</p>
+                    <h6 class="fw-bold mt-4 mb-3">Konten Lengkap</h6>
+                    <p>{{ $fullContents[$i] }}</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-navy rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -131,7 +174,9 @@
                 <p class="card-text text-muted small">{{ $a->description }}</p>
 
                 <div class="d-flex justify-content-between align-items-center mt-auto">
-                    <a href="#" class="btn btn-navy px-4">Read More</a>
+                    <button type="button" class="btn btn-navy px-4" data-bs-toggle="modal" data-bs-target="#detailModal{{ $a->id }}">
+                        Read More
+                    </button>
                     
                     <div class="d-flex align-items-center">
                         <button class="icon-btn color-edit" data-bs-toggle="modal" data-bs-target="#editModal{{ $a->id }}">
@@ -145,6 +190,36 @@
                             </button>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL UNTUK ARTIKEL DATABASE -->
+    <div class="modal fade modal-detail" id="detailModal{{ $a->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white" style="background: #0a1f44;">
+                    <h5 class="modal-title fw-bold">{{ $a->title }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    @if($a->image_path)
+                        <img src="{{ asset('storage/' . $a->image_path) }}" alt="{{ $a->title }}" style="width: 100%; border-radius: 10px; margin-bottom: 20px;">
+                    @elseif($a->image_url)
+                        <img src="{{ $a->image_url }}" alt="{{ $a->title }}" style="width: 100%; border-radius: 10px; margin-bottom: 20px;">
+                    @else
+                        <img src="{{ $images[0] }}" alt="{{ $a->title }}" style="width: 100%; border-radius: 10px; margin-bottom: 20px;">
+                    @endif
+                    <h6 class="fw-bold mb-3">Deskripsi</h6>
+                    <p>{{ $a->description }}</p>
+                    <h6 class="fw-bold mt-4 mb-3">Konten Lengkap</h6>
+                    <p>{{ $a->full_content ?? $a->description . ' ' . $fullContents[0] }}</p>
+                    <hr>
+                    <small class="text-muted">Ditambahkan pada: {{ $a->created_at ? date('d F Y', strtotime($a->created_at)) : date('d F Y') }}</small>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-navy rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -168,6 +243,10 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Deskripsi</label>
                             <textarea name="description" class="form-control" rows="4" required>{{ $a->description }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Konten Lengkap</label>
+                            <textarea name="full_content" class="form-control" rows="6" placeholder="Isi konten lengkap artikel disini...">{{ $a->full_content }}</textarea>
                         </div>
                         
                         {{-- Gambar Saat Ini --}}
@@ -234,7 +313,11 @@
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Deskripsi <span class="text-danger">*</span></label>
-                <textarea name="description" class="form-control border-0 shadow-sm" rows="3" placeholder="Tulis isi..." required></textarea>
+                <textarea name="description" class="form-control border-0 shadow-sm" rows="3" placeholder="Tulis deskripsi singkat..." required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Konten Lengkap <span class="text-danger">*</span></label>
+                <textarea name="full_content" class="form-control border-0 shadow-sm" rows="6" placeholder="Tulis konten lengkap artikel disini..." required></textarea>
             </div>
             
             {{-- Pilihan Gambar --}}
