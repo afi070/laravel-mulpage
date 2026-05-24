@@ -8,10 +8,26 @@ use Illuminate\Support\Facades\Storage;
 
 class ArticleController extends Controller
 {
+    // 🔐 MIDDLEWARE: Proteksi method tertentu (tambah, edit, hapus) wajib login
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['index', 'show']);
+    }
+
     public function index()
     {
         $articles = Article::latest()->get();
         return view('articles', compact('articles'));
+    }
+
+    /**
+     * ✅ TAMBAHKAN METHOD INI!
+     * Menampilkan detail satu artikel
+     */
+    public function show($id)
+    {
+        $article = Article::findOrFail($id);
+        return view('articles.show', compact('article'));
     }
 
     public function create()
@@ -24,12 +40,12 @@ class ArticleController extends Controller
         $request->validate([
             'title' => 'required',
             'description' => 'required',
-            'full_content' => 'required', // ← TAMBAHKAN VALIDASI
+            'full_content' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'image_url' => 'nullable|url'
         ]);
 
-        $data = $request->only(['title', 'description', 'full_content']); // ← TAMBAHKAN 'full_content'
+        $data = $request->only(['title', 'description', 'full_content']);
         
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('articles', 'public');
@@ -58,11 +74,11 @@ class ArticleController extends Controller
         $request->validate([
             'title' => 'required',
             'description' => 'required',
-            'full_content' => 'required', // ← TAMBAHKAN VALIDASI
+            'full_content' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $data = $request->only(['title', 'description', 'full_content']); // ← TAMBAHKAN 'full_content'
+        $data = $request->only(['title', 'description', 'full_content']);
         
         if ($request->hasFile('image')) {
             if ($article->image_path) {

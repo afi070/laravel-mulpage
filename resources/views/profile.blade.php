@@ -47,6 +47,52 @@
             font-weight: bold;
         }
 
+        /* Style untuk auth links */
+        .auth-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: 25px;
+        }
+
+        .auth-links .btn-logout {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .auth-links .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .auth-links .user-name {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .auth-link-custom {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .auth-link-custom:hover {
+            color: white !important;
+        }
+
+        .auth-register {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
         /* Wrapper untuk memposisikan kartu di tengah */
         .main-wrapper {
             flex-grow: 1;
@@ -169,6 +215,20 @@
                 <a href="/profile" class="nav-link-custom active">Profile</a>
                 <a href="/articles" class="nav-link-custom">Articles</a>
                 <a href="/contact" class="nav-link-custom">Contact</a>
+                
+                <!-- 🔥 AUTHENTICATION LINKS (Tambahan) -->
+                <div class="auth-links">
+                    @auth
+                        <span class="user-name"> {{ Auth::user()->name }}</span>
+                        <form method="POST" action="/logout" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn-logout">Logout</button>
+                        </form>
+                    @else
+                        <a href="/login" class="auth-link-custom">Login</a>
+                        <a href="/register" class="auth-link-custom auth-register">Register</a>
+                    @endauth
+                </div>
             </div>
         </div>
     </nav>

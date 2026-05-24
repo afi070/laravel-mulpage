@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - MyBlog</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -13,7 +12,6 @@
             background: #f5f7fa;
         }
 
-        /* NAVBAR */
         .navbar {
             background: #0a1f44;
         }
@@ -22,14 +20,12 @@
             color: white !important;
         }
 
-        /* CAROUSEL TEXT */
         .carousel-caption {
             background: rgba(0,0,0,0.5);
             padding: 15px;
             border-radius: 10px;
         }
 
-        /* CARD */
         .card {
             border: none;
             border-radius: 15px;
@@ -41,16 +37,40 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
-        /* FOOTER */
         footer {
             background: #0a1f44;
             color: white;
+        }
+
+        .auth-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .auth-links .btn-logout {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .auth-links .btn-logout:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+
+        .auth-links .user-name {
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
 
-<!-- 🔥 NAVBAR (SUDAH FIX ROUTE) -->
 <nav class="navbar navbar-expand-lg">
   <div class="container">
     <a class="navbar-brand text-white" href="/">MyBlog</a>
@@ -66,11 +86,23 @@
         <li class="nav-item"><a class="nav-link" href="/articles">Articles</a></li>
         <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
       </ul>
+      
+      <div class="auth-links ms-3">
+        @auth
+          <span class="user-name text-white">{{ Auth::user()->name }}</span>
+          <form method="POST" action="/logout" class="d-inline">
+            @csrf
+            <button type="submit" class="btn-logout">Logout</button>
+          </form>
+        @else
+          <a href="/login" class="text-white" style="text-decoration: none;">Login</a>
+          <a href="/register" class="text-white" style="text-decoration: none; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px;">Register</a>
+        @endauth
+      </div>
     </div>
   </div>
 </nav>
 
-<!-- 🔥 CAROUSEL -->
 <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
   <div class="carousel-inner">
 
@@ -109,7 +141,6 @@
   </button>
 </div>
 
-<!-- 🔥 CONTENT -->
 <div class="container my-5">
   <h2 class="text-center mb-4">Berita Terbaru</h2>
 
@@ -151,12 +182,10 @@
   </div>
 </div>
 
-<!-- 🔥 FOOTER -->
 <footer class="text-center p-3">
   <p>© 2026 Khurin Nafiah</p>
 </footer>
 
-<!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

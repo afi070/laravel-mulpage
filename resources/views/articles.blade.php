@@ -19,6 +19,51 @@
         .nav-link { transition: 0.3s; opacity: 0.8; }
         .nav-link:hover, .nav-link.active { opacity: 1; color: #fff !important; }
 
+        /* Style untuk auth links */
+        .auth-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: 20px;
+        }
+
+        .auth-links .btn-logout {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .auth-links .btn-logout:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+        }
+
+        .auth-links .user-name {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            color: white;
+        }
+
+        .auth-link {
+            color: white !important;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .auth-link:hover {
+            opacity: 0.8;
+        }
+
+        .auth-register {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
         .card {
             border: none;
             border-radius: 15px;
@@ -48,14 +93,14 @@
             background: none;
             border: none;
             padding: 5px 10px;
-            font-size: 1.5rem; /* Ukuran Besar */
+            font-size: 1.5rem;
             transition: 0.2s;
             cursor: pointer;
         }
         
         /* Warna Icon */
-        .color-edit { color: #ffc107; } /* Kuning */
-        .color-delete { color: #dc3545; } /* Merah */
+        .color-edit { color: #ffc107; }
+        .color-delete { color: #dc3545; }
         
         .icon-btn:hover { transform: scale(1.2); filter: brightness(1.1); }
 
@@ -82,6 +127,20 @@
                 <a href="/profile" class="nav-link">Profile</a>
                 <a href="/articles" class="nav-link active">Articles</a>
                 <a href="/contact" class="nav-link">Contact</a>
+            </div>
+            
+            <!-- 🔥 AUTHENTICATION LINKS (Tambahan) -->
+            <div class="auth-links">
+                @auth
+                    <span class="user-name"> {{ Auth::user()->name }}</span>
+                    <form method="POST" action="/logout" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn-logout">Logout</button>
+                    </form>
+                @else
+                    <a href="/login" class="auth-link">Login</a>
+                    <a href="/register" class="auth-link auth-register">Register</a>
+                @endauth
             </div>
         </div>
     </div>
