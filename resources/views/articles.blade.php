@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Articles - MyBlog</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome untuk Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -19,7 +18,6 @@
         .nav-link { transition: 0.3s; opacity: 0.8; }
         .nav-link:hover, .nav-link.active { opacity: 1; color: #fff !important; }
 
-        /* Style untuk auth links */
         .auth-links {
             display: flex;
             align-items: center;
@@ -88,7 +86,6 @@
         }
         .btn-navy:hover { background: #162d55; transform: scale(1.02); color: white; }
 
-        /* Styling Icon Aksi */
         .icon-btn {
             background: none;
             border: none;
@@ -98,13 +95,11 @@
             cursor: pointer;
         }
         
-        /* Warna Icon */
         .color-edit { color: #ffc107; }
         .color-delete { color: #dc3545; }
         
         .icon-btn:hover { transform: scale(1.2); filter: brightness(1.1); }
 
-        /* Modal detail artikel */
         .modal-detail .modal-content {
             border-radius: 15px;
         }
@@ -129,10 +124,9 @@
                 <a href="/contact" class="nav-link">Contact</a>
             </div>
             
-            <!-- 🔥 AUTHENTICATION LINKS (Tambahan) -->
             <div class="auth-links">
                 @auth
-                    <span class="user-name"> {{ Auth::user()->name }}</span>
+                    <span class="user-name">{{ Auth::user()->name }}</span>
                     <form method="POST" action="/logout" class="d-inline">
                         @csrf
                         <button type="submit" class="btn-logout">Logout</button>
@@ -165,7 +159,7 @@
 
     <div class="row g-4">
 
-    {{-- 1. ARTIKEL DEFAULT DENGAN PESAN ALERT --}}
+    {{-- ARTIKEL DEFAULT --}}
     @for ($i = 0; $i < 6; $i++)
     <div class="col-lg-4 col-md-6">
         <div class="card h-100">
@@ -178,22 +172,23 @@
                     <button type="button" class="btn btn-navy px-4" data-bs-toggle="modal" data-bs-target="#detailModalDefault{{ $i }}">
                         Read More
                     </button>
+                    @auth
                     <div style="opacity: 0.8;" class="d-flex align-items-center">
-                        {{-- Tombol Edit Dummy --}}
                         <button class="icon-btn color-edit" onclick="alert('Data default tidak bisa diubah')">
                             <i class="fa-solid fa-pencil"></i>
                         </button>
-                        {{-- Tombol Hapus Dummy --}}
                         <button class="icon-btn color-delete" onclick="alert('Data default tidak bisa dihapus')">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
+                    @else
+                    <div style="width: 70px;"></div>
+                    @endauth
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DETAIL UNTUK ARTIKEL DEFAULT -->
     <div class="modal fade modal-detail" id="detailModalDefault{{ $i }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
@@ -216,11 +211,10 @@
     </div>
     @endfor
 
-    {{-- 2. ARTIKEL DATABASE (FUNGSI ASLI) --}}
+    {{-- ARTIKEL DATABASE --}}
     @foreach ($articles as $a)
     <div class="col-lg-4 col-md-6">
         <div class="card h-100">
-            {{-- TAMPILAN GAMBAR - Support image_path (upload) dan image_url (link) --}}
             @if($a->image_path)
                 <img src="{{ asset('storage/' . $a->image_path) }}" alt="{{ $a->title }}">
             @elseif($a->image_url)
@@ -237,6 +231,7 @@
                         Read More
                     </button>
                     
+                    @auth
                     <div class="d-flex align-items-center">
                         <button class="icon-btn color-edit" data-bs-toggle="modal" data-bs-target="#editModal{{ $a->id }}">
                             <i class="fa-solid fa-pencil"></i>
@@ -249,12 +244,14 @@
                             </button>
                         </form>
                     </div>
+                    @else
+                    <div style="width: 70px;"></div>
+                    @endauth
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DETAIL UNTUK ARTIKEL DATABASE -->
     <div class="modal fade modal-detail" id="detailModal{{ $a->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
@@ -284,7 +281,7 @@
         </div>
     </div>
 
-    <!-- MODAL EDIT ASLI (DENGAN UPLOAD FILE) -->
+    @auth
     <div class="modal fade" id="editModal{{ $a->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
@@ -308,7 +305,6 @@
                             <textarea name="full_content" class="form-control" rows="6" placeholder="Isi konten lengkap artikel disini...">{{ $a->full_content }}</textarea>
                         </div>
                         
-                        {{-- Gambar Saat Ini --}}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Gambar Saat Ini</label>
                             @if($a->image_path)
@@ -326,7 +322,6 @@
                             @endif
                         </div>
                         
-                        {{-- Ganti Gambar --}}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Ganti Gambar (Opsional)</label>
                             <input type="file" name="image" class="form-control" accept="image/jpeg,image/png,image/gif">
@@ -342,13 +337,16 @@
             </div>
         </div>
     </div>
+    @endauth
+
     @endforeach
 
     </div>
 
     <hr class="my-5">
 
-    {{-- FORM TAMBAH ARTIKEL DENGAN UPLOAD FILE --}}
+    {{-- FORM TAMBAH ARTIKEL (HANYA UNTUK USER LOGIN) --}}
+    @auth
     <div class="p-4 bg-white rounded-4 shadow-sm mb-5">
         <div class="p-3 rounded-3 text-white mb-4" style="background: linear-gradient(135deg, #0a1f44, #162d55);">
             <h4 class="mb-0 fw-bold">Tambah Artikel</h4>
@@ -379,7 +377,6 @@
                 <textarea name="full_content" class="form-control border-0 shadow-sm" rows="6" placeholder="Tulis konten lengkap artikel disini..." required></textarea>
             </div>
             
-            {{-- Pilihan Gambar --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">Gambar Artikel</label>
                 
@@ -394,14 +391,12 @@
                     </div>
                 </div>
                 
-                {{-- Upload file --}}
                 <div id="upload_section">
                     <input type="file" name="image" class="form-control border-0 shadow-sm" accept="image/*">
                     <small class="text-muted">Format JPG, PNG (Max 2MB)</small>
                     <div id="preview_tambah" class="mt-2"></div>
                 </div>
                 
-                {{-- Link URL (tetap dipertahankan) --}}
                 <div id="url_section" style="display: none;">
                     <input type="text" name="image_url" class="form-control border-0 shadow-sm" placeholder="https://...">
                     <small class="text-muted">Masukkan URL gambar</small>
@@ -413,12 +408,19 @@
             </button>
         </form>
     </div>
+    @else
+    <div class="alert alert-info text-center mb-5">
+        <i class="fas fa-lock me-2"></i>
+        🔐 <a href="/login" class="alert-link">Login</a> atau 
+        <a href="/register" class="alert-link">Register</a> untuk menambahkan artikel baru
+    </div>
+    @endauth
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// Toggle upload vs URL untuk form tambah
 const uploadSection = document.getElementById('upload_section');
 const urlSection = document.getElementById('url_section');
 const radioUpload = document.getElementById('type_upload');
@@ -457,7 +459,6 @@ if (imageInput) {
         }
     });
 }
-
 
 @foreach ($articles as $a)
 document.querySelector('#editModal{{ $a->id }} input[name="image"]')?.addEventListener('change', function(e) {
