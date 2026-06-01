@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Article;
+use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 
 class ArticleController extends Controller
 {
-    // 🔐 MIDDLEWARE: Proteksi method tertentu (tambah, edit, hapus) wajib login
     public function __construct()
     {
         $this->middleware('auth')->except(['index', 'show']);
@@ -16,14 +16,20 @@ class ArticleController extends Controller
 
     public function index()
     {
-        $articles = Article::latest()->get();
-        return view('articles', compact('articles'));
+        $categories = Category::all();
+        
+        if (request()->get('category')) {
+            $articles = Article::with('category')
+                ->where('category_id', request()->get('category'))
+                ->latest()
+                ->get();
+        } else {
+            $articles = Article::with('category')->latest()->get();
+        }
+        
+        return view('articles', compact('articles', 'categories'));
     }
 
-    /**
-     * ✅ TAMBAHKAN METHOD INI!
-     * Menampilkan detail satu artikel
-     */
     public function show($id)
     {
         $article = Article::findOrFail($id);
@@ -32,7 +38,8 @@ class ArticleController extends Controller
 
     public function create()
     {
-        return view('articles.create');
+        $categories = Category::all();
+        return view('articles.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -41,11 +48,13 @@ class ArticleController extends Controller
             'title' => 'required',
             'description' => 'required',
             'full_content' => 'required',
+            'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'image_url' => 'nullable|url'
         ]);
 
         $data = $request->only(['title', 'description', 'full_content']);
+        $data['category_id'] = $request->category_id;
         
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('articles', 'public');
@@ -64,7 +73,8 @@ class ArticleController extends Controller
     public function edit($id)
     {
         $article = Article::findOrFail($id);
-        return view('articles.edit', compact('article'));
+        $categories = Category::all();
+        return view('articles.edit', compact('article', 'categories'));
     }
 
     public function update(Request $request, $id)
@@ -75,10 +85,12 @@ class ArticleController extends Controller
             'title' => 'required',
             'description' => 'required',
             'full_content' => 'required',
+            'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $data = $request->only(['title', 'description', 'full_content']);
+        $data['category_id'] = $request->category_id;
         
         if ($request->hasFile('image')) {
             if ($article->image_path) {

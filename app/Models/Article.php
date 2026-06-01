@@ -12,8 +12,14 @@ class Article extends Model
     protected $fillable = [
         'title', 
         'description', 
-        'full_content',     // ← TAMBAHKAN INI
+        'full_content',
         'image_url',
-        'image_path'
+        'image_path',
+        'category_id'  
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

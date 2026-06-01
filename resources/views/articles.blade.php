@@ -108,6 +108,17 @@
             border-radius: 10px;
             margin-bottom: 20px;
         }
+
+        .btn-outline-primary.active {
+            background: #0a1f44 !important;
+            color: white !important;
+            border-color: #0a1f44 !important;
+        }
+
+        .btn-outline-primary:hover {
+            background: #0a1f44 !important;
+            color: white !important;
+        }
     </style>
 </head>
 
@@ -143,73 +154,23 @@
 <div class="container mt-5">
     <h2 class="text-center mb-5 fw-bold" style="color: #0a1f44;">Articles</h2>
 
+    {{-- FILTER KATEGORI --}}
+    <div class="d-flex justify-content-center gap-3 mb-5 flex-wrap">
+        <a href="/articles" class="btn btn-outline-primary rounded-pill px-4 {{ !request()->get('category') ? 'active' : '' }}" style="border-color: #0a1f44; color: #0a1f44;">
+            Semua
+        </a>
+        @foreach($categories as $category)
+        <a href="/articles?category={{ $category->id }}" class="btn btn-outline-primary rounded-pill px-4 {{ request()->get('category') == $category->id ? 'active' : '' }}" style="border-color: #0a1f44; color: #0a1f44;">
+            {{ $category->name }}
+        </a>
+        @endforeach
+    </div>
+
     @php
-    $defaultTitles = ["Belajar HTML & CSS Dasar", "Mengenal Laravel untuk Pemula", "Tips Membuat Website Responsif", "Panduan Bootstrap Modern", "Trend Teknologi Web 2026", "Cara Membuat Blog Sederhana"];
-    $defaultDescs = ["Pelajari dasar HTML dan CSS untuk membuat tampilan website yang rapi dan terstruktur.", "Panduan lengkap Laravel untuk pemula agar bisa membuat web lebih cepat dan efisien.", "Tips membuat website yang tampilannya fleksibel di semua ukuran layar.", "Belajar Bootstrap untuk mempercepat pembuatan UI modern dan responsif.", "Update perkembangan teknologi web terbaru yang wajib kamu ketahui.", "Langkah mudah membuat blog sederhana menggunakan HTML, CSS, dan Laravel dasar."];
-    $fullContents = [
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        "Laravel adalah framework PHP yang powerful dan elegan. Dalam artikel ini kita akan membahas dasar-dasar Laravel termasuk routing, controller, blade template, dan Eloquent ORM. Dengan memahami Laravel, Anda bisa membangun website modern dengan cepat dan efisien. Framework ini juga menyediakan berbagai fitur keamanan dan kemudahan dalam pengelolaan database.",
-        "Website responsif adalah keharusan di era mobile saat ini. Pelajari teknik-teknik menggunakan CSS Grid, Flexbox, dan media queries untuk membuat tampilan yang adaptif di berbagai perangkat. Kami juga akan membahas tips praktis untuk menguji responsivitas website Anda.",
-        "Bootstrap 5 hadir dengan berbagai komponen modern yang memudahkan pengembangan website. Dalam panduan ini, Anda akan belajar menggunakan grid system, komponen navbar, card, modal, dan utility classes yang membuat styling menjadi lebih cepat.",
-        "Tahun 2026 membawa berbagai tren baru dalam pengembangan web termasuk penguasaan AI, WebAssembly, dan framework modern. Simak update lengkapnya di sini untuk tetap up-to-date dengan teknologi terkini.",
-        "Membuat blog sendiri tidak pernah semudah ini. Ikuti langkah-langkah praktis mulai dari setup environment Laravel, membuat database, CRUD artikel, hingga deployment ke hosting. Cocok untuk pemula yang ingin memiliki blog pribadi."
-    ];
     $images = ["https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1526378722484-bd91ca387e72?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=300&fit=crop", "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=300&fit=crop"];
     @endphp
 
     <div class="row g-4">
-
-    {{-- ARTIKEL DEFAULT --}}
-    @for ($i = 0; $i < 6; $i++)
-    <div class="col-lg-4 col-md-6">
-        <div class="card h-100">
-            <img src="{{ $images[$i] }}" alt="article">
-            <div class="card-body">
-                <h5 class="card-title fw-bold" style="color: #0a1f44;">{{ $defaultTitles[$i] }}</h5>
-                <p class="card-text text-muted small">{{ $defaultDescs[$i] }}</p>
-                
-                <div class="d-flex justify-content-between align-items-center mt-auto">
-                    <button type="button" class="btn btn-navy px-4" data-bs-toggle="modal" data-bs-target="#detailModalDefault{{ $i }}">
-                        Read More
-                    </button>
-                    @auth
-                    <div style="opacity: 0.8;" class="d-flex align-items-center">
-                        <button class="icon-btn color-edit" onclick="alert('Data default tidak bisa diubah')">
-                            <i class="fa-solid fa-pencil"></i>
-                        </button>
-                        <button class="icon-btn color-delete" onclick="alert('Data default tidak bisa dihapus')">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>
-                    @else
-                    <div style="width: 70px;"></div>
-                    @endauth
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade modal-detail" id="detailModalDefault{{ $i }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header text-white" style="background: #0a1f44;">
-                    <h5 class="modal-title fw-bold">{{ $defaultTitles[$i] }}</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <img src="{{ $images[$i] }}" alt="{{ $defaultTitles[$i] }}" style="width: 100%; border-radius: 10px; margin-bottom: 20px;">
-                    <h6 class="fw-bold mb-3">Deskripsi</h6>
-                    <p>{{ $defaultDescs[$i] }}</p>
-                    <h6 class="fw-bold mt-4 mb-3">Konten Lengkap</h6>
-                    <p>{{ $fullContents[$i] }}</p>
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-navy rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endfor
 
     {{-- ARTIKEL DATABASE --}}
     @foreach ($articles as $a)
@@ -224,6 +185,9 @@
             @endif
             <div class="card-body">
                 <h5 class="card-title fw-bold" style="color: #0a1f44;">{{ $a->title }}</h5>
+                <div class="mb-2">
+                    <span class="badge" style="background: #0a1f44;">📂 {{ $a->category->name ?? 'Uncategorized' }}</span>
+                </div>
                 <p class="card-text text-muted small">{{ $a->description }}</p>
 
                 <div class="d-flex justify-content-between align-items-center mt-auto">
@@ -267,10 +231,11 @@
                     @else
                         <img src="{{ $images[0] }}" alt="{{ $a->title }}" style="width: 100%; border-radius: 10px; margin-bottom: 20px;">
                     @endif
+                    <p><strong>Kategori:</strong> {{ $a->category->name ?? 'Uncategorized' }}</p>
                     <h6 class="fw-bold mb-3">Deskripsi</h6>
                     <p>{{ $a->description }}</p>
                     <h6 class="fw-bold mt-4 mb-3">Konten Lengkap</h6>
-                    <p>{{ $a->full_content ?? $a->description . ' ' . $fullContents[0] }}</p>
+                    <p>{{ $a->full_content }}</p>
                     <hr>
                     <small class="text-muted">Ditambahkan pada: {{ $a->created_at ? date('d F Y', strtotime($a->created_at)) : date('d F Y') }}</small>
                 </div>
@@ -297,12 +262,23 @@
                             <input type="text" name="title" class="form-control" value="{{ $a->title }}" required>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label fw-bold">Kategori</label>
+                            <select name="category_id" class="form-control" required>
+                                <option value="">Pilih Kategori</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ $a->category_id == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label fw-bold">Deskripsi</label>
                             <textarea name="description" class="form-control" rows="4" required>{{ $a->description }}</textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Konten Lengkap</label>
-                            <textarea name="full_content" class="form-control" rows="6" placeholder="Isi konten lengkap artikel disini...">{{ $a->full_content }}</textarea>
+                            <textarea name="full_content" class="form-control" rows="6">{{ $a->full_content }}</textarea>
                         </div>
                         
                         <div class="mb-3">
@@ -369,6 +345,15 @@
                 <input type="text" name="title" class="form-control border-0 shadow-sm" placeholder="Masukkan judul" required>
             </div>
             <div class="mb-3">
+                <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                <select name="category_id" class="form-control border-0 shadow-sm" required>
+                    <option value="">Pilih Kategori</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-3">
                 <label class="form-label fw-semibold">Deskripsi <span class="text-danger">*</span></label>
                 <textarea name="description" class="form-control border-0 shadow-sm" rows="3" placeholder="Tulis deskripsi singkat..." required></textarea>
             </div>
@@ -411,7 +396,7 @@
     @else
     <div class="alert alert-info text-center mb-5">
         <i class="fas fa-lock me-2"></i>
-        🔐 <a href="/login" class="alert-link">Login</a> atau 
+         <a href="/login" class="alert-link">Login</a> atau 
         <a href="/register" class="alert-link">Register</a> untuk menambahkan artikel baru
     </div>
     @endauth
